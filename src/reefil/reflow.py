@@ -6,27 +6,45 @@ import textwrap
 _SENTENCE_END = re.compile(r"[.!?]\s*$")
 _SENTENCE_START = re.compile(r"^#\s+[A-Z@]")
 _LIST_ITEM = re.compile(r"^#\s+(?:[-*+]\s|\d+[.)]\s)")
+_BANNER = re.compile(r"^#\s*(?:[-=#*~]{2,}(?:\s|$)|.*[-=#*~]{4,}\s*$)")
 
 
 def _is_comment(line: str) -> bool:
     return line.startswith("# ")
 
 
-def _split_paragraphs(run: list[str]) -> list[list[str]]:
-    """Split a run of comment lines where a sentence ends or starts."""
-    paragraphs: list[list[str]] = []
+def _is_prose(line: str) -> bool:
+    """Whether a comment line is text that may be rewrapped."""
+    return not _BANNER.match(line)
+
+
+def _starts_paragraph(line: str) -> bool:
+    return bool(_SENTENCE_START.match(line) or _LIST_ITEM.match(line))
+
+
+def _split_paragraphs(run: list[str]) -> list[tuple[bool, list[str]]]:
+    """Split a run of comment lines into (rewrap?, lines) chunks."""
+    chunks: list[tuple[bool, list[str]]] = []
     current: list[str] = []
-    for line in run:
-        if current and (_SENTENCE_START.match(line) or _LIST_ITEM.match(line)):
-            paragraphs.append(current)
+
+    def close() -> None:
+        nonlocal current
+        if current:
+            chunks.append((True, current))
             current = []
+
+    for line in run:
+        if not _is_prose(line):
+            close()
+            chunks.append((False, [line]))
+            continue
+        if _starts_paragraph(line):
+            close()
         current.append(line)
         if _SENTENCE_END.search(line):
-            paragraphs.append(current)
-            current = []
-    if current:
-        paragraphs.append(current)
-    return paragraphs
+            close()
+    close()
+    return chunks
 
 
 def _wrap(paragraph: list[str], line_length: int) -> list[str]:
@@ -55,6 +73,6 @@ def reflow(source: str, line_length: int) -> str:
         while i < len(lines) and _is_comment(lines[i]):
             run.append(lines[i])
             i += 1
-        for paragraph in _split_paragraphs(run):
-            out.extend(_wrap(paragraph, line_length))
+        for rewrap, chunk in _split_paragraphs(run):
+            out.extend(_wrap(chunk, line_length) if rewrap else chunk)
     return "\n".join(out)

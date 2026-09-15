@@ -63,3 +63,20 @@ def test_markers_such_as_todo_start_their_own_paragraph():
         # NOTE: a note
         """)
     assert reflow(source, line_length=88) == source
+
+
+def test_leaves_banners_alone_and_does_not_mistake_kwargs_for_one():
+    source = dedent("""\
+        # -- section title -----------------------
+        # prose under the banner that
+        # continues here
+        # ----------------------------------------
+        # **kwargs are forwarded and the line
+        # continues here
+        """)
+    assert reflow(source, line_length=88) == dedent("""\
+        # -- section title -----------------------
+        # prose under the banner that continues here
+        # ----------------------------------------
+        # **kwargs are forwarded and the line continues here
+        """)
