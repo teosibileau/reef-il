@@ -28,3 +28,19 @@ def test_check_reports_without_writing(tmp_path):
     target.write_text(WRAPPED_EARLY)
     assert main(["--check", str(target)]) == 1
     assert target.read_text() == WRAPPED_EARLY
+
+
+def test_line_length_comes_from_the_nearest_pyproject(tmp_path):
+    (tmp_path / "pyproject.toml").write_text("[tool.ruff]\nline-length = 30\n")
+    target = tmp_path / "pkg" / "mod.py"
+    target.parent.mkdir()
+    target.write_text("# a comment that runs past thirty columns\n")
+    assert main([str(target)]) == 1
+    assert target.read_text() == "# a comment that runs past\n# thirty columns\n"
+
+
+def test_line_length_flag_overrides_pyproject(tmp_path):
+    (tmp_path / "pyproject.toml").write_text("[tool.ruff]\nline-length = 30\n")
+    target = tmp_path / "mod.py"
+    target.write_text("# a comment that runs past thirty columns\n")
+    assert main(["--line-length", "88", str(target)]) == 0
