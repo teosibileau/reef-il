@@ -1,10 +1,40 @@
 from __future__ import annotations
 
+import re
 import textwrap
+
+_SENTENCE_END = re.compile(r"[.!?]\s*$")
 
 
 def _is_comment(line: str) -> bool:
     return line.startswith("# ")
+
+
+def _split_paragraphs(run: list[str]) -> list[list[str]]:
+    """Split a run of comment lines where a sentence ends."""
+    paragraphs: list[list[str]] = []
+    current: list[str] = []
+    for line in run:
+        current.append(line)
+        if _SENTENCE_END.search(line):
+            paragraphs.append(current)
+            current = []
+    if current:
+        paragraphs.append(current)
+    return paragraphs
+
+
+def _wrap(paragraph: list[str], line_length: int) -> list[str]:
+    text = " ".join(line[2:].strip() for line in paragraph)
+    return [
+        "# " + w
+        for w in textwrap.wrap(
+            text,
+            width=line_length - 2,
+            break_long_words=False,
+            break_on_hyphens=False,
+        )
+    ]
 
 
 def reflow(source: str, line_length: int) -> str:
@@ -16,18 +46,10 @@ def reflow(source: str, line_length: int) -> str:
             out.append(lines[i])
             i += 1
             continue
-        paragraph = []
+        run = []
         while i < len(lines) and _is_comment(lines[i]):
-            paragraph.append(lines[i][2:].strip())
+            run.append(lines[i])
             i += 1
-        text = " ".join(paragraph)
-        out.extend(
-            "# " + w
-            for w in textwrap.wrap(
-                text,
-                width=line_length - 2,
-                break_long_words=False,
-                break_on_hyphens=False,
-            )
-        )
+        for paragraph in _split_paragraphs(run):
+            out.extend(_wrap(paragraph, line_length))
     return "\n".join(out)
