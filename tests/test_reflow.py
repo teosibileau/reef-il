@@ -187,3 +187,20 @@ def test_greedy_joins_across_sentence_boundaries_but_not_markers():
         # TODO: still its own paragraph
         # - still a list item
         """)
+
+
+def test_a_reflowed_file_is_stable_on_a_second_pass():
+    source = dedent("""\
+        # This comment was wrapped at sixty
+        # columns by an old habit. It has two
+        # sentences, and a list:
+        # - one
+        # - two
+        #
+        # And a second paragraph after a blank
+        # comment line.
+        """)
+    once = reflow(source, line_length=60)
+    assert once != source
+    assert reflow(once, line_length=60) == once
+
