@@ -6,6 +6,7 @@ import textwrap
 import tokenize
 
 _SENTENCE_END = re.compile(r"[.!?]\s*$")
+_PARAGRAPH_END = re.compile(r":\s*$")
 _SENTENCE_START = re.compile(r"^#\s+[A-Z@]")
 _LIST_ITEM = re.compile(r"^#\s+(?:[-*+]\s|\d+[.)]\s)")
 _BANNER = re.compile(r"^#\s*(?:[-=#*~]{2,}(?:\s|$)|.*[-=#*~]{4,}\s*$)")
@@ -61,7 +62,7 @@ def _split_paragraphs(run: list[str]) -> list[tuple[bool, list[str]]]:
         if _starts_paragraph(line):
             close()
         current.append(line)
-        if _SENTENCE_END.search(line):
+        if _SENTENCE_END.search(line) or _PARAGRAPH_END.search(line):
             close()
     close()
     return chunks

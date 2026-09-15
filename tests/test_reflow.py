@@ -161,3 +161,15 @@ def test_keeps_indentation_and_leaves_deeper_indented_lines_alone():
             # and the prose resumes
             return 1
         """)
+
+
+def test_a_line_ending_in_a_colon_closes_its_paragraph():
+    source = dedent("""\
+        # the options are the following:
+        # left, right and center are
+        # the choices
+        """)
+    assert reflow(source, line_length=88) == dedent("""\
+        # the options are the following:
+        # left, right and center are the choices
+        """)
