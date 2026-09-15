@@ -4,6 +4,7 @@ import re
 import textwrap
 
 _SENTENCE_END = re.compile(r"[.!?]\s*$")
+_SENTENCE_START = re.compile(r"^#\s+[A-Z@]")
 
 
 def _is_comment(line: str) -> bool:
@@ -11,10 +12,13 @@ def _is_comment(line: str) -> bool:
 
 
 def _split_paragraphs(run: list[str]) -> list[list[str]]:
-    """Split a run of comment lines where a sentence ends."""
+    """Split a run of comment lines where a sentence ends or starts."""
     paragraphs: list[list[str]] = []
     current: list[str] = []
     for line in run:
+        if current and _SENTENCE_START.match(line):
+            paragraphs.append(current)
+            current = []
         current.append(line)
         if _SENTENCE_END.search(line):
             paragraphs.append(current)

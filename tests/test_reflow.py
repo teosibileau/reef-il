@@ -33,3 +33,13 @@ def test_does_not_join_across_the_end_of_a_sentence():
         # Activate locally as required.
         """)
     assert reflow(source, line_length=88) == source
+
+
+def test_does_not_join_when_the_next_line_starts_a_sentence():
+    source = dedent("""\
+        # Create the deactivated periodic task
+        # Activate locally as required
+        # @alex: TODO forbid .svg files
+        # @alex: TODO upload to S3
+        """)
+    assert reflow(source, line_length=88) == source
