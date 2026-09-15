@@ -53,3 +53,13 @@ def test_keeps_list_items_on_their_own_lines():
         # 1. numbered item
         """)
     assert reflow(source, line_length=88) == source
+
+
+def test_markers_such_as_todo_start_their_own_paragraph():
+    source = dedent("""\
+        # the first note ends here
+        # TODO: do the thing
+        # FIXME: the other thing
+        # NOTE: a note
+        """)
+    assert reflow(source, line_length=88) == source
