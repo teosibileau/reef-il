@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import io
 import re
 import textwrap
+import tokenize
 
 _SENTENCE_END = re.compile(r"[.!?]\s*$")
 _SENTENCE_START = re.compile(r"^#\s+[A-Z@]")
@@ -13,8 +15,16 @@ _DIRECTIVE = re.compile(
 )
 
 
-def _is_comment(line: str) -> bool:
-    return line.startswith("#")
+def _comment_rows(source: str) -> set[int]:
+    """1-based rows holding a comment with nothing but whitespace before it."""
+    rows = set()
+    try:
+        for tok in tokenize.generate_tokens(io.StringIO(source).readline):
+            if tok.type == tokenize.COMMENT and not tok.line[: tok.start[1]].strip():
+                rows.add(tok.start[0])
+    except (tokenize.TokenError, SyntaxError):
+        return set()
+    return rows
 
 
 def _is_prose(line: str) -> bool:
@@ -70,15 +80,16 @@ def _wrap(paragraph: list[str], line_length: int) -> list[str]:
 
 def reflow(source: str, line_length: int) -> str:
     lines = source.split("\n")
+    rows = _comment_rows(source)
     out: list[str] = []
     i = 0
     while i < len(lines):
-        if not _is_comment(lines[i]):
+        if i + 1 not in rows:
             out.append(lines[i])
             i += 1
             continue
         run = []
-        while i < len(lines) and _is_comment(lines[i]):
+        while i + 1 in rows:
             run.append(lines[i])
             i += 1
         for rewrap, chunk in _split_paragraphs(run):

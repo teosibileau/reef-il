@@ -125,3 +125,21 @@ def test_leaves_inline_comments_alone():
         x = 1  # short
         # another
         """)
+
+
+def test_leaves_hashes_inside_strings_alone():
+    source = dedent('''\
+        TEMPLATE = """
+        # not a comment that
+        # should be joined
+        """
+        # a real comment that
+        # should be joined
+        ''')
+    assert reflow(source, line_length=88) == dedent('''\
+        TEMPLATE = """
+        # not a comment that
+        # should be joined
+        """
+        # a real comment that should be joined
+        ''')
