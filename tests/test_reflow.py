@@ -143,3 +143,21 @@ def test_leaves_hashes_inside_strings_alone():
         """
         # a real comment that should be joined
         ''')
+
+
+def test_keeps_indentation_and_leaves_deeper_indented_lines_alone():
+    source = dedent("""\
+        def f():
+            # an indented comment that
+            # continues here
+            #     sample = code()
+            # and the prose resumes
+            return 1
+        """)
+    assert reflow(source, line_length=88) == dedent("""\
+        def f():
+            # an indented comment that continues here
+            #     sample = code()
+            # and the prose resumes
+            return 1
+        """)

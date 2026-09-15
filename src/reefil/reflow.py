@@ -15,15 +15,15 @@ _DIRECTIVE = re.compile(
 )
 
 
-def _comment_rows(source: str) -> set[int]:
-    """1-based rows holding a comment with nothing but whitespace before it."""
-    rows = set()
+def _comment_rows(source: str) -> dict[int, int]:
+    """1-based row -> column of every comment with only whitespace before it."""
+    rows = {}
     try:
         for tok in tokenize.generate_tokens(io.StringIO(source).readline):
             if tok.type == tokenize.COMMENT and not tok.line[: tok.start[1]].strip():
-                rows.add(tok.start[0])
+                rows[tok.start[0]] = tok.start[1]
     except (tokenize.TokenError, SyntaxError):
-        return set()
+        return {}
     return rows
 
 
@@ -33,6 +33,8 @@ def _is_prose(line: str) -> bool:
         return False  # "#", "#!", "#:", "#####"
     if _BANNER.match(line) or _DIRECTIVE.match(line):
         return False
+    if line.startswith("#  "):
+        return False  # indented relative to the paragraph: code sample or table
     return bool(re.search(r"[A-Za-z]", line))
 
 
@@ -65,13 +67,13 @@ def _split_paragraphs(run: list[str]) -> list[tuple[bool, list[str]]]:
     return chunks
 
 
-def _wrap(paragraph: list[str], line_length: int) -> list[str]:
+def _wrap(paragraph: list[str], width: int) -> list[str]:
     text = " ".join(line[2:].strip() for line in paragraph)
     return [
         "# " + w
         for w in textwrap.wrap(
             text,
-            width=line_length - 2,
+            width=width,
             break_long_words=False,
             break_on_hyphens=False,
         )
@@ -88,10 +90,14 @@ def reflow(source: str, line_length: int) -> str:
             out.append(lines[i])
             i += 1
             continue
+        col = rows[i + 1]
+        indent = lines[i][:col]
         run = []
-        while i + 1 in rows:
-            run.append(lines[i])
+        while rows.get(i + 1) == col:
+            run.append(lines[i][col:])
             i += 1
         for rewrap, chunk in _split_paragraphs(run):
-            out.extend(_wrap(chunk, line_length) if rewrap else chunk)
+            width = max(line_length - col - 2, 20)
+            comments = _wrap(chunk, width) if rewrap else chunk
+            out.extend(indent + c for c in comments)
     return "\n".join(out)
