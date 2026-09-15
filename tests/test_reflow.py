@@ -204,3 +204,8 @@ def test_a_reflowed_file_is_stable_on_a_second_pass():
     assert once != source
     assert reflow(once, line_length=60) == once
 
+
+def test_keeps_crlf_line_endings():
+    source = "# a comment that\r\n# continues here\r\nx = 1\r\n"
+    expected = "# a comment that continues here\r\nx = 1\r\n"
+    assert reflow(source, line_length=88) == expected

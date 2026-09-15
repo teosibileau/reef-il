@@ -98,7 +98,8 @@ def reflow(source: str, line_length: int, greedy: bool = False) -> str:
     By default a line joins the next only when the break is mid-sentence.
     With ``greedy`` every adjacent prose line that fits is joined.
     """
-    lines = source.split("\n")
+    newline = "\r\n" if "\r\n" in source else "\n"
+    lines = source.split(newline)
     rows = _comment_rows(source)
     out: list[str] = []
     i = 0
@@ -117,4 +118,4 @@ def reflow(source: str, line_length: int, greedy: bool = False) -> str:
             width = max(line_length - col - 2, 20)
             comments = _wrap(chunk, width) if rewrap else chunk
             out.extend(indent + c for c in comments)
-    return "\n".join(out)
+    return newline.join(out)
