@@ -15,6 +15,11 @@ def main(argv: list[str] | None = None) -> int:
         description="Refill full-line # comments to the configured line length.",
     )
     parser.add_argument("files", nargs="+", type=Path)
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="report files that would change without writing them",
+    )
     args = parser.parse_args(argv)
 
     changed = 0
@@ -24,8 +29,11 @@ def main(argv: list[str] | None = None) -> int:
         if result == source:
             continue
         changed += 1
-        path.write_text(result, encoding="utf-8")
-        print(f"reflowed comments in {path}")
+        if args.check:
+            print(f"would reflow comments in {path}")
+        else:
+            path.write_text(result, encoding="utf-8")
+            print(f"reflowed comments in {path}")
     return 1 if changed else 0
 
 
