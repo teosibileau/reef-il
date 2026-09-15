@@ -7,15 +7,23 @@ _SENTENCE_END = re.compile(r"[.!?]\s*$")
 _SENTENCE_START = re.compile(r"^#\s+[A-Z@]")
 _LIST_ITEM = re.compile(r"^#\s+(?:[-*+]\s|\d+[.)]\s)")
 _BANNER = re.compile(r"^#\s*(?:[-=#*~]{2,}(?:\s|$)|.*[-=#*~]{4,}\s*$)")
+_DIRECTIVE = re.compile(
+    r"^#\s*(?:noqa|type:|fmt:|isort:|ruff:|pragma|pylint:|pyright:|mypy:|nosec|"
+    r"pytype:|-\*-)"
+)
 
 
 def _is_comment(line: str) -> bool:
-    return line.startswith("# ")
+    return line.startswith("#")
 
 
 def _is_prose(line: str) -> bool:
     """Whether a comment line is text that may be rewrapped."""
-    return not _BANNER.match(line)
+    if not line.startswith("# "):
+        return False  # "#", "#!", "#:", "#####"
+    if _BANNER.match(line) or _DIRECTIVE.match(line):
+        return False
+    return bool(re.search(r"[A-Za-z]", line))
 
 
 def _starts_paragraph(line: str) -> bool:

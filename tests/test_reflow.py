@@ -80,3 +80,31 @@ def test_leaves_banners_alone_and_does_not_mistake_kwargs_for_one():
         # ----------------------------------------
         # **kwargs are forwarded and the line continues here
         """)
+
+
+def test_leaves_directive_and_header_comments_alone():
+    source = dedent("""\
+        #!/usr/bin/env python3
+        # -*- coding: utf-8 -*-
+        # noqa: E501
+        # type: ignore
+        # fmt: off
+        # pragma: no cover
+        # ruff: noqa
+        #: sphinx attribute doc
+        #
+        # prose that follows and
+        # continues here
+        """)
+    assert reflow(source, line_length=88) == dedent("""\
+        #!/usr/bin/env python3
+        # -*- coding: utf-8 -*-
+        # noqa: E501
+        # type: ignore
+        # fmt: off
+        # pragma: no cover
+        # ruff: noqa
+        #: sphinx attribute doc
+        #
+        # prose that follows and continues here
+        """)
