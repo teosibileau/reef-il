@@ -44,3 +44,10 @@ def test_line_length_flag_overrides_pyproject(tmp_path):
     target = tmp_path / "mod.py"
     target.write_text("# a comment that runs past thirty columns\n")
     assert main(["--line-length", "88", str(target)]) == 0
+
+
+def test_greedy_flag_joins_across_sentences(tmp_path):
+    target = tmp_path / "mod.py"
+    target.write_text("# First sentence.\n# Second sentence.\n")
+    assert main(["--greedy", str(target)]) == 1
+    assert target.read_text() == "# First sentence. Second sentence.\n"

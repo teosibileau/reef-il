@@ -42,6 +42,11 @@ def main(argv: list[str] | None = None) -> int:
         f"then {DEFAULT_LINE_LENGTH}",
     )
     parser.add_argument(
+        "--greedy",
+        action="store_true",
+        help="join every adjacent line that fits, ignoring sentence boundaries",
+    )
+    parser.add_argument(
         "--check",
         action="store_true",
         help="report files that would change without writing them",
@@ -56,7 +61,7 @@ def main(argv: list[str] | None = None) -> int:
             or DEFAULT_LINE_LENGTH
         )
         source = path.read_text(encoding="utf-8")
-        result = reflow(source, line_length)
+        result = reflow(source, line_length, greedy=args.greedy)
         if result == source:
             continue
         changed += 1
