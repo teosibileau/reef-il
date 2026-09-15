@@ -43,3 +43,13 @@ def test_does_not_join_when_the_next_line_starts_a_sentence():
         # @alex: TODO upload to S3
         """)
     assert reflow(source, line_length=88) == source
+
+
+def test_keeps_list_items_on_their_own_lines():
+    source = dedent("""\
+        # - first item
+        # - second item
+        # * starred item
+        # 1. numbered item
+        """)
+    assert reflow(source, line_length=88) == source
