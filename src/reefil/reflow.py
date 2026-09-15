@@ -9,6 +9,7 @@ _SENTENCE_END = re.compile(r"[.!?]\s*$")
 _PARAGRAPH_END = re.compile(r":\s*$")
 _SENTENCE_START = re.compile(r"^#\s+[A-Z@]")
 _LIST_ITEM = re.compile(r"^#\s+(?:[-*+]\s|\d+[.)]\s)")
+_MARKER = re.compile(r"^#\s+(?:TODO|FIXME|NOTE|XXX|HACK|BUG)\b")
 _BANNER = re.compile(r"^#\s*(?:[-=#*~]{2,}(?:\s|$)|.*[-=#*~]{4,}\s*$)")
 _DIRECTIVE = re.compile(
     r"^#\s*(?:noqa|type:|fmt:|isort:|ruff:|pragma|pylint:|pyright:|mypy:|nosec|"
@@ -39,11 +40,21 @@ def _is_prose(line: str) -> bool:
     return bool(re.search(r"[A-Za-z]", line))
 
 
-def _starts_paragraph(line: str) -> bool:
-    return bool(_SENTENCE_START.match(line) or _LIST_ITEM.match(line))
+def _starts_paragraph(line: str, greedy: bool) -> bool:
+    if _LIST_ITEM.match(line) or _MARKER.match(line):
+        return True
+    return not greedy and bool(_SENTENCE_START.match(line))
 
 
-def _split_paragraphs(run: list[str]) -> list[tuple[bool, list[str]]]:
+def _ends_paragraph(line: str, greedy: bool) -> bool:
+    if _PARAGRAPH_END.search(line):
+        return True
+    return not greedy and bool(_SENTENCE_END.search(line))
+
+
+def _split_paragraphs(
+    run: list[str], greedy: bool = False
+) -> list[tuple[bool, list[str]]]:
     """Split a run of comment lines into (rewrap?, lines) chunks."""
     chunks: list[tuple[bool, list[str]]] = []
     current: list[str] = []
@@ -59,10 +70,10 @@ def _split_paragraphs(run: list[str]) -> list[tuple[bool, list[str]]]:
             close()
             chunks.append((False, [line]))
             continue
-        if _starts_paragraph(line):
+        if _starts_paragraph(line, greedy):
             close()
         current.append(line)
-        if _SENTENCE_END.search(line) or _PARAGRAPH_END.search(line):
+        if _ends_paragraph(line, greedy):
             close()
     close()
     return chunks
@@ -81,7 +92,12 @@ def _wrap(paragraph: list[str], width: int) -> list[str]:
     ]
 
 
-def reflow(source: str, line_length: int) -> str:
+def reflow(source: str, line_length: int, greedy: bool = False) -> str:
+    """Return ``source`` with its full-line comment paragraphs rewrapped.
+
+    By default a line joins the next only when the break is mid-sentence.
+    With ``greedy`` every adjacent prose line that fits is joined.
+    """
     lines = source.split("\n")
     rows = _comment_rows(source)
     out: list[str] = []
@@ -97,7 +113,7 @@ def reflow(source: str, line_length: int) -> str:
         while rows.get(i + 1) == col:
             run.append(lines[i][col:])
             i += 1
-        for rewrap, chunk in _split_paragraphs(run):
+        for rewrap, chunk in _split_paragraphs(run, greedy):
             width = max(line_length - col - 2, 20)
             comments = _wrap(chunk, width) if rewrap else chunk
             out.extend(indent + c for c in comments)

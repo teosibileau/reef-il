@@ -173,3 +173,17 @@ def test_a_line_ending_in_a_colon_closes_its_paragraph():
         # the options are the following:
         # left, right and center are the choices
         """)
+
+
+def test_greedy_joins_across_sentence_boundaries_but_not_markers():
+    source = dedent("""\
+        # Create the deactivated periodic task.
+        # Activate locally as required.
+        # TODO: still its own paragraph
+        # - still a list item
+        """)
+    assert reflow(source, line_length=88, greedy=True) == dedent("""\
+        # Create the deactivated periodic task. Activate locally as required.
+        # TODO: still its own paragraph
+        # - still a list item
+        """)
