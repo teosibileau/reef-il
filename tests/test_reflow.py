@@ -108,3 +108,20 @@ def test_leaves_directive_and_header_comments_alone():
         #
         # prose that follows and continues here
         """)
+
+
+def test_leaves_inline_comments_alone():
+    source = dedent("""\
+        import os  # inline comment that is long enough to look like it wants wrapping
+        # a full-line comment that
+        # continues here
+        x = 1  # short
+        # another
+        """)
+    assert reflow(source, line_length=40) == dedent("""\
+        import os  # inline comment that is long enough to look like it wants wrapping
+        # a full-line comment that continues
+        # here
+        x = 1  # short
+        # another
+        """)
