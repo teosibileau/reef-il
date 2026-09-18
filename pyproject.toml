@@ -12,6 +12,10 @@ classifiers = [
     "Topic :: Software Development :: Quality Assurance",
 ]
 
+[project.urls]
+Homepage = "https://github.com/teosibileau/reef-il"
+Changelog = "https://github.com/teosibileau/reef-il/releases"
+
 [project.scripts]
 reef-il = "reefil.cli:main"
 
