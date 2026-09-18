@@ -9,7 +9,7 @@ nothing flags comments wrapped well short of it.
 ```yaml
 # .pre-commit-config.yaml
 repos:
-  - repo: https://github.com/<owner>/reef-il
+  - repo: https://github.com/teosibileau/reef-il
     rev: v0.1.0
     hooks:
       - id: reef-il
