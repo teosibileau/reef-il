@@ -51,3 +51,12 @@ def test_greedy_flag_joins_across_sentences(tmp_path):
     target.write_text("# First sentence.\n# Second sentence.\n")
     assert main(["--greedy", str(target)]) == 1
     assert target.read_text() == "# First sentence. Second sentence.\n"
+
+
+def test_docstrings_flag_opts_in(tmp_path):
+    target = tmp_path / "mod.py"
+    source = 'def f():\n    """Summary.\n\n    a body wrapped\n    early.\n    """\n'
+    target.write_text(source)
+    assert main([str(target)]) == 0
+    assert main(["--docstrings", str(target)]) == 1
+    assert target.read_text() == 'def f():\n    """Summary.\n\n    a body wrapped early.\n    """\n'

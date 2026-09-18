@@ -75,6 +75,21 @@ fits, the way fill-paragraph does in an editor.
 A line ending in `:` closes its paragraph. Files that fail to tokenize are
 left unchanged, and CRLF line endings are preserved.
 
+### Docstrings
+
+`--docstrings` (pass it as `args: [--docstrings]` in the hook) also rewraps
+the plain prose paragraphs of docstrings, under the same join rules. It is
+deliberately narrow:
+
+- Only `"""` docstrings that span several lines with the closing quotes on
+  their own line. One-liners, `'''` and raw strings are skipped.
+- The summary line is never touched, even when it overflows.
+- Rewrapping stops at the first section header (`Args:`, `Returns:`, a NumPy
+  underlined header), Sphinx field (`:param x:`), directive (`.. note::`) or
+  doctest (`>>>`). Everything from there on is left as it is.
+- Paragraphs indented deeper than the docstring, such as code after `::`,
+  tables and continuation lines, are left alone.
+
 ## Development
 
 ```sh

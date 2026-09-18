@@ -45,6 +45,11 @@ def main(argv: list[str] | None = None) -> int:
         help="join every adjacent line that fits, ignoring sentence boundaries",
     )
     parser.add_argument(
+        "--docstrings",
+        action="store_true",
+        help="also rewrap the plain prose paragraphs of docstrings, never the summary line",
+    )
+    parser.add_argument(
         "--check",
         action="store_true",
         help="report files that would change without writing them",
@@ -59,15 +64,15 @@ def main(argv: list[str] | None = None) -> int:
             or DEFAULT_LINE_LENGTH
         )
         source = path.read_text(encoding="utf-8")
-        result = reflow(source, line_length, greedy=args.greedy)
+        result = reflow(source, line_length, greedy=args.greedy, docstrings=args.docstrings)
         if result == source:
             continue
         changed += 1
         if args.check:
-            print(f"would reflow comments in {path}")
+            print(f"would reflow {path}")
         else:
             path.write_text(result, encoding="utf-8")
-            print(f"reflowed comments in {path}")
+            print(f"reflowed {path}")
     return 1 if changed else 0
 
 
