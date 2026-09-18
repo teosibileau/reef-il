@@ -1,6 +1,6 @@
 - id: reef-il
   name: reef-il
-  description: Refill full-line # comments to the configured line length.
+  description: Refill full-line # comments and docstring prose to the configured line length.
   entry: reef-il
   language: python
   types: [python]

@@ -30,7 +30,8 @@ def line_length_from_pyproject(start: Path) -> int | None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="reef-il",
-        description="Refill full-line # comments to the configured line length.",
+        description="Refill full-line # comments, and with --docstrings docstring prose, "
+        "to the configured line length.",
     )
     parser.add_argument("files", nargs="+", type=Path)
     parser.add_argument(
