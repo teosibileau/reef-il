@@ -23,6 +23,6 @@ repos:
     hooks:
       - id: reef-il
         name: reef-il (self)
-        entry: uv run reef-il
+        entry: uv run reef-il --docstrings
         language: system
         types: [python]
