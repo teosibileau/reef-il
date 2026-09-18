@@ -90,6 +90,12 @@ deliberately narrow:
 - Paragraphs indented deeper than the docstring, such as code after `::`,
   tables and continuation lines, are left alone.
 
+Treat it as experimental. Docstrings carry far more structure than comments,
+and the rules above are heuristics, not a parser for any docstring style.
+Review the diff the first time you run it on a codebase, and expect the
+description under `Args:` and friends to stay as it is until section-aware
+wrapping lands.
+
 ## Development
 
 ```sh
