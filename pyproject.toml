@@ -29,7 +29,7 @@ packages = ["src/reefil"]
 testpaths = ["tests"]
 
 [tool.ruff]
-line-length = 88
+line-length = 100
 src = ["src", "tests"]
 
 [tool.ruff.lint]
