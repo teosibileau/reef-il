@@ -20,11 +20,26 @@ Place it before the ruff hooks so E501 sees the refilled result. The line
 length comes from `[tool.ruff] line-length` in the nearest `pyproject.toml`,
 then `[tool.black]`, then 88. Pass `args: [--line-length, "120"]` to override.
 
-The command also runs on its own:
+To pin the [PyPI package](https://pypi.org/project/reef-il/) instead of the
+git tag, use a local hook. Note that `pre-commit autoupdate` will not bump
+the version for you in this form:
+
+```yaml
+  - repo: local
+    hooks:
+      - id: reef-il
+        name: reef-il
+        entry: reef-il
+        language: python
+        types: [python]
+        additional_dependencies: [reef-il==0.1.0]
+```
+
+The command also runs on its own, with no install through `uvx`:
 
 ```sh
-reef-il src/**/*.py          # rewrite, exit 1 if anything changed
-reef-il --check src/**/*.py  # report only
+uvx reef-il src/**/*.py          # rewrite, exit 1 if anything changed
+uvx reef-il --check src/**/*.py  # report only
 ```
 
 ## What it does
