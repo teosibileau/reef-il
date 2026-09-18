@@ -1,10 +1,9 @@
 """Rewrap the plain prose paragraphs of docstrings.
 
-Only the safe subset is touched: a triple double-quoted docstring spanning
-several lines, whose closing quotes sit alone on the last line. The summary
-line is never changed. Body paragraphs are rewrapped only up to the first
-section header, field list, directive or doctest, and only when every line
-of the paragraph shares the docstring's indentation.
+Only the safe subset is touched: a triple double-quoted docstring spanning several lines, whose
+closing quotes sit alone on the last line. The summary line is never changed. Body paragraphs are
+rewrapped only up to the first section header, field list, directive or doctest, and only when every
+line of the paragraph shares the docstring's indentation.
 """
 
 from __future__ import annotations
@@ -59,7 +58,11 @@ def _prose_blocks(body: list[str], indent: str) -> list[tuple[int, int]]:
         aligned = all(
             line.startswith(indent) and not line[len(indent) :][:1].isspace() for line in lines
         )
-        if aligned and not after_literal and not any(line.rstrip().endswith("\\") for line in lines):
+        if (
+            aligned
+            and not after_literal
+            and not any(line.rstrip().endswith("\\") for line in lines)
+        ):
             blocks.append((start, i))
         after_literal = bool(_LITERAL.search(lines[-1]))
     return blocks

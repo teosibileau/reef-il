@@ -142,7 +142,11 @@ def test_stops_at_a_numpy_section():
 
 
 def test_stops_at_sphinx_fields_directives_and_doctests():
-    for stop in (":param x: wrapped\n    far too early.", ".. note:: wrapped\n    early.", ">>> f()"):
+    for stop in (
+        ":param x: wrapped\n    far too early.",
+        ".. note:: wrapped\n    early.",
+        ">>> f()",
+    ):
         source = dedent('''\
             def f(x):
                 """Summary.
@@ -282,4 +286,6 @@ def test_leaves_files_that_do_not_parse_alone():
 
 def test_preserves_crlf():
     source = 'def f():\r\n    """Summary.\r\n\r\n    a wrapped\r\n    early.\r\n    """\r\n'
-    assert refill(source) == 'def f():\r\n    """Summary.\r\n\r\n    a wrapped early.\r\n    """\r\n'
+    assert (
+        refill(source) == 'def f():\r\n    """Summary.\r\n\r\n    a wrapped early.\r\n    """\r\n'
+    )
