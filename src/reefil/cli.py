@@ -23,9 +23,7 @@ def line_length_from_pyproject(start: Path) -> int | None:
             match = re.search(r"^\s*line-length\s*=\s*(\d+)", text, re.M)
             return int(match.group(1)) if match else None
         tool = tomllib.loads(text).get("tool", {})
-        return tool.get("ruff", {}).get("line-length") or tool.get("black", {}).get(
-            "line-length"
-        )
+        return tool.get("ruff", {}).get("line-length") or tool.get("black", {}).get("line-length")
     return None
 
 

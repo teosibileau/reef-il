@@ -52,9 +52,7 @@ def _ends_paragraph(line: str, greedy: bool) -> bool:
     return not greedy and bool(_SENTENCE_END.search(line))
 
 
-def _split_paragraphs(
-    run: list[str], greedy: bool = False
-) -> list[tuple[bool, list[str]]]:
+def _split_paragraphs(run: list[str], greedy: bool = False) -> list[tuple[bool, list[str]]]:
     """Split a run of comment lines into (rewrap?, lines) chunks."""
     chunks: list[tuple[bool, list[str]]] = []
     current: list[str] = []
