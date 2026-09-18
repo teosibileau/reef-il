@@ -1,6 +1,6 @@
 [project]
 name = "reef-il"
-version = "0.1.0"
+version = "0.1.1"
 description = "Refill full-line # comments and docstring prose to the configured line length, as a pre-commit hook."
 readme = "README.md"
 license = "MIT"

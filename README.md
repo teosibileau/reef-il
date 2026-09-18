@@ -11,7 +11,7 @@ the limit, but nothing flags prose wrapped well short of it.
 # .pre-commit-config.yaml
 repos:
   - repo: https://github.com/teosibileau/reef-il
-    rev: v0.1.0
+    rev: v0.1.1
     hooks:
       - id: reef-il
 ```
@@ -32,7 +32,7 @@ the version for you in this form:
         entry: reef-il
         language: python
         types: [python]
-        additional_dependencies: [reef-il==0.1.0]
+        additional_dependencies: [reef-il==0.1.1]
 ```
 
 The command also runs on its own, with no install through `uvx`:
@@ -125,7 +125,7 @@ pre-commit run --all-files
 Bump `version` in `pyproject.toml`, merge to `main`, then tag and push:
 
 ```sh
-git tag v0.2.0 && git push origin v0.2.0
+git tag v0.1.2 && git push origin v0.1.2
 ```
 
 The release workflow checks the tag against the version, builds and smoke
