@@ -103,3 +103,15 @@ uv sync
 uv run pytest
 pre-commit run --all-files
 ```
+
+## Releasing
+
+Bump `version` in `pyproject.toml`, merge to `main`, then tag and push:
+
+```sh
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+The release workflow checks the tag against the version, builds and smoke
+tests the wheel, publishes to PyPI through trusted publishing, and creates
+the GitHub release with the artifacts attached.
