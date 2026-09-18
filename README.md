@@ -1,8 +1,9 @@
 # reef-il
 
-Refill full-line `#` comments to the configured line length. A pre-commit hook
-for the gap ruff leaves open: E501 flags comments that run past the limit, but
-nothing flags comments wrapped well short of it.
+Refill prose in Python source to the configured line length: full-line `#`
+comments, and with `--docstrings` the body paragraphs of docstrings. A
+pre-commit hook for the gap ruff leaves open: E501 flags lines that run past
+the limit, but nothing flags prose wrapped well short of it.
 
 ## Install
 

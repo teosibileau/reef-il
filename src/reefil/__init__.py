@@ -1,4 +1,4 @@
-"""reef-il: refill full-line ``#`` comments to the configured line length."""
+"""reef-il: refill full-line ``#`` comments and docstring prose to the line length."""
 
 from reefil.reflow import reflow
 
